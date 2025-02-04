@@ -13,6 +13,7 @@ namespace OzayAkcan.BiltekKlavyeTest
         [DllImport("User32.dll")]
         static extern int SetForegroundWindow(IntPtr point);
         private const uint WM_KEYDOWN = 0x0100;
+        private const uint WM_KEYUP = 0x0101;
         private const int WH_KEYBOARD_LL = 13;
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
@@ -64,12 +65,12 @@ namespace OzayAkcan.BiltekKlavyeTest
         private static IntPtr HookCallback(
             int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
+            if (nCode >= 0)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
                 Form1 form1 = Application.OpenForms["Form1"] as Form1;
                 if (form1 != null)
-                    form1.TusGonder((Keys)vkCode);
+                    form1.TusGonder((Keys)vkCode, wParam == (IntPtr)WM_KEYDOWN);
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
