@@ -65,7 +65,7 @@ namespace OzayAkcan.BiltekKlavyeTest
         }
         private static int SetHookMouse()
         {
-            mouseHookCallback = new MouseKeyboardProc(HookCallback);
+            mouseHookCallback = new MouseKeyboardProc(HookCallbackMouse);
 
             using (Process curProcess = Process.GetCurrentProcess())
             using (ProcessModule curModule = curProcess.MainModule)
@@ -99,11 +99,26 @@ namespace OzayAkcan.BiltekKlavyeTest
                 MouseMessages mouseMessages = (MouseMessages)wParam;
                 if (form1 != null)
                 {
-                    form1.TusGonder((Keys)vkCode, wParam == (IntPtr)WM_KEYDOWN);
-                    form1.MouseGonder(mouseMessages);
+                    Keys key = (Keys)vkCode;
+                    if(key == Keys.RMenu)
+                        form1.TusGonder(Keys.RMenu, wParam == (IntPtr)WM_KEYDOWN);
+                    else
+                        form1.TusGonder((Keys)vkCode, wParam == (IntPtr)WM_KEYDOWN);
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
+        }
+        private static int HookCallbackMouse(
+            int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0)
+            {
+                Form1 form1 = Application.OpenForms["Form1"] as Form1;
+                MouseMessages mouseMessages = (MouseMessages)wParam;
+                if (form1 != null)
+                    form1.MouseGonder(mouseMessages);
+            }
+            return CallNextHookEx(_hookIDMouse, nCode, wParam, lParam);
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]

@@ -41,6 +41,19 @@ namespace OzayAkcan.BiltekKlavyeTest
         {
             string ky = key.ToString();
             Console.WriteLine(ky);
+            TusGonder(ky, down);
+        }
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;  // Turn on WS_EX_COMPOSITED
+                return cp;
+            }
+        }
+        public void TusGonder(string key, bool down)
+        {
             List<KeyControl> keyControls = new List<KeyControl>();
             foreach (var panel in panels)
             {
@@ -49,14 +62,16 @@ namespace OzayAkcan.BiltekKlavyeTest
                     if (control is KeyControl)
                     {
                         KeyControl keyControlTemp = (KeyControl)control;
-                        if (keyControlTemp.KeyName.ToLower() == ky.ToLower())
+                        if (keyControlTemp.KeyName.ToLower() == key.ToLower())
                         {
                             keyControls.Add(keyControlTemp);
                             break;
                         }
                     }
                 }
-                if (keyControls.Count > 0 && keyControls[0].KeyName.ToLower() != "return")
+                if (keyControls.FindIndex(kc => kc.KeyName == "return") >= 0)
+                    continue;
+                else if (keyControls.Count > 0)
                     break;
             }
             foreach (var keyControl in keyControls)
